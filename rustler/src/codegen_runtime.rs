@@ -129,12 +129,15 @@ where
                 Ok(res) => NifReturnable::as_returned(res, env),
                 Err(err) => NifReturnable::as_returned(err, env),
             },
-            Err(err) => match err.downcast::<NifReturned>() {
-                Ok(ty) => NifReturned::Term(ty.apply(env)),
-                Err(reason) => {
-                    let message = format!("nif_panicked: {:?}", reason);
-                    let term = message.encode(env);
-                    NifReturned::Raise(term.as_c_arg())
+            Err(err) => {
+                println!("What is this? {:?}", err);
+                match err.downcast::<NifReturned>() {
+                    Ok(ty) => NifReturned::Term(ty.apply(env)),
+                    Err(reason) => {
+                        let message = format!("nif_panicked: {:?}", reason);
+                        let term = message.encode(env);
+                        NifReturned::Raise(term.as_c_arg())
+                    }
                 }
             },
         }
