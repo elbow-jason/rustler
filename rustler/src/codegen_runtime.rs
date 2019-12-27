@@ -131,9 +131,10 @@ where
             },
             Err(err) => match err.downcast::<NifReturned>() {
                 Ok(ty) => NifReturned::Term(ty.apply(env)),
-                Err(_) => {
-                    let term = crate::types::atom::nif_panicked().as_c_arg();
-                    NifReturned::Raise(term)
+                Err(reason) => {
+                    let message = format!("nif_panicked: {:?}", reason);
+                    let term = message.encode(env);
+                    NifReturned::Raise(term.as_c_arg())
                 }
             },
         }
